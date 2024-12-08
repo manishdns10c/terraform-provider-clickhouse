@@ -7,9 +7,13 @@ terraform {
 }
 
 provider "clickhouse" {
-  host     = "test.clickhouse.org"
-  username = "xyz"
-  password = "cddcd"
+  host     = "localhost:9000"
+  username = "test_user"
+  password = "oops"
 }
 
-# data "clickhouse_coffees" "example" {}
+data "clickhouse_databases" "example" {}
+
+output "databases" {
+  value = data.clickhouse_databases.example.databases
+}
