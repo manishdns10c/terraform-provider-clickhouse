@@ -6,6 +6,10 @@ terraform {
   }
 }
 
-provider "clickhouse" {}
+provider "clickhouse" {
+  host     = "test.clickhouse.org"
+  username = "xyz"
+  password = "cddcd"
+}
 
-data "clickhouse_coffees" "example" {}
+# data "clickhouse_coffees" "example" {}
