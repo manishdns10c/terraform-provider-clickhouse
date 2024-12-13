@@ -161,6 +161,9 @@ func (p *clickhouseProvider) DataSources(_ context.Context) []func() datasource.
 		func() datasource.DataSource {
 			return &clickhouseUsersDataSource{}
 		},
+		func() datasource.DataSource {
+			return &clickhouseRolesDataSource{}
+		},
 	}
 }
 
@@ -169,6 +172,9 @@ func (p *clickhouseProvider) Resources(_ context.Context) []func() resource.Reso
 	return []func() resource.Resource{
 		func() resource.Resource {
 			return &clickhouseUserResource{}
+		},
+		func() resource.Resource {
+			return &clickhouseDatabaseResource{}
 		},
 	}
 }
