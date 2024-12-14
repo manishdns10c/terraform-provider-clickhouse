@@ -12,8 +12,9 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource              = &clickhouseUserResource{}
-	_ resource.ResourceWithConfigure = &clickhouseUserResource{}
+	_ resource.Resource                = &clickhouseUserResource{}
+	_ resource.ResourceWithConfigure   = &clickhouseUserResource{}
+	_ resource.ResourceWithImportState = &clickhouseUserResource{}
 )
 
 // clickhouseUserResource is the resource implementation.
@@ -173,4 +174,38 @@ func (r *clickhouseUserResource) Configure(ctx context.Context, req resource.Con
 	}
 
 	r.client = client
+}
+
+func (r *clickhouseUserResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// Retrieve the import ID (username) from the request
+	username := req.ID
+
+	// Check if the user exists in ClickHouse
+	query := fmt.Sprintf("SELECT count() > 0 FROM system.users WHERE name = '%s'", username)
+	var exists bool
+	err := r.client.QueryRow(ctx, query).Scan(&exists)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error importing ClickHouse user",
+			"Could not read ClickHouse user, unexpected error: "+err.Error(),
+		)
+		return
+	}
+
+	if !exists {
+		resp.Diagnostics.AddError(
+			"User does not exist",
+			"The ClickHouse user "+username+" does not exist.",
+		)
+		return
+	}
+
+	// If the user exists, set the state with the username
+	state := clickhouseUserResourceModel{
+		Username: types.StringValue(username),
+		// Note: Password is not retrieved during import for security reasons
+	}
+
+	diags := resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
 }

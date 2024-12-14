@@ -23,6 +23,11 @@ resource "clickhouse_user" "test" {
   password = "test"
 }
 
+resource "clickhouse_user" "kumar" {
+  username = "kumar"
+  password = "test"
+}
+
 # resource "clickhouse_database" "test" {
 #   database = "test_ddatabase"
 # }
